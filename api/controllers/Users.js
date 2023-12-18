@@ -35,7 +35,6 @@ const signupService = async (data) => {
                     }
                 });
             });
-            console.log(hashedPassword);
             const [results] = await connection.execute(
                 'INSERT INTO `Users` VALUES (?, ?, ?)',
                 [data.username, data.email, hashedPassword],
@@ -82,6 +81,28 @@ const loginService = async (data) => {
     }
 }
 
+const changePasswordService = async (data) => {
+    // eslint-disable-next-line no-useless-catch
+    try {
+        const hashedPassword = await new Promise((resolve, reject) => {
+            bcrypt.hash(data.password, 10, (err, hash) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(hash);
+                }
+            });
+        });
+        const [results] = await connection.execute(
+            'UPDATE `Users` SET `password` = ? WHERE `email` = ?' ,
+            [hashedPassword, data.email]
+        );
+        return 'Password changed successfully'
+    } catch (error) {
+        console.error('Error in change-password:', error.message);
+        throw error;
+    }
+}
 
 
 exports.signup = async (req, res) => {
@@ -144,6 +165,7 @@ exports.sendOTP = async (req, res) => {
                 }
             }).sendMail(mailOptions, (error, info) => {
                 if (error) {
+                    console.error('Error in send-otp:', error.message);
                     res.status(500).json({
                         error: "Error sending OTP",
                     })
@@ -160,6 +182,7 @@ exports.sendOTP = async (req, res) => {
             });
         }
     } catch (error) {
+        console.error('Error in send-otp:', error.message);
         res.status(error.status || 500).json({
             error: error.message
         });
@@ -167,7 +190,14 @@ exports.sendOTP = async (req, res) => {
 };
 
 exports.changePassword = async (req, res) => {
-    res.status(201).json({
-        message: 'Password changed successfully'
-    });
+    try{
+        const result = await changePasswordService(req.body);
+        res.status(200).json({
+            message: result
+        });
+    }catch(error){
+        res.status(error.status || 500).json({
+            error: error.message
+        });
+    }
 }
