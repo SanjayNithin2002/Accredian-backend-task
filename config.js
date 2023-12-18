@@ -2,8 +2,8 @@ const config = {
     db: {
         host: "db4free.net",
         user: "sanjaynithin",
-        password: "sanjaynithin2002",
-        database: "accredian_db",
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
         connectTimeout: 60000,
         waitForConnections: true,
         connectionLimit: 10,
