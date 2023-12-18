@@ -1,5 +1,7 @@
+/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 const mysql = require('mysql2');
 const config = require('../../config');
 const pool = mysql.createPool(config.db);
@@ -60,7 +62,7 @@ const loginService = async (data) => {
         } else {
             const isValidPassword = await new Promise((resolve, reject) => {
                 bcrypt.compare(data.password, results[0].password, (err, response) => {
-                    if(err){
+                    if (err) {
                         reject('Auth Failed');
                     }
                     resolve(response);
@@ -79,6 +81,8 @@ const loginService = async (data) => {
         throw error;
     }
 }
+
+
 
 exports.signup = async (req, res) => {
     try {
@@ -105,4 +109,65 @@ exports.login = async (req, res) => {
             error: error.message
         })
     }
+};
+
+exports.sendOTP = async (req, res) => {
+    try {
+        const [results] = await connection.execute(
+            'SELECT * FROM `Users` WHERE `email` = ?',
+            [req.body.email]
+        );
+        if (results.length > 0) {
+            const generatedOTP = Math.floor(100000 + Math.random() * 900000);
+            const mailOptions = {
+                from: 'backend.server@mail.com',
+                to: req.body.email,
+                subject: 'OTP to Change your Password',
+                text: `
+            Hello, 
+            
+            You have requested to change your password. Please use the following OTP (One-Time Password) to complete the process:
+            
+            OTP: ${generatedOTP}
+            
+            If you didn't request this change, please ignore this email.
+            
+            Thank you,
+            Accredian-Backend-Task
+            `
+            };
+            var transporter = nodemailer.createTransport({
+                service: process.env.MAIL_SERVER || 'gmail',
+                auth: {
+                    user: process.env.NODEMAIL,
+                    pass: process.env.NODEMAIL_PASSWORD
+                }
+            }).sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    res.status(500).json({
+                        error: "Error sending OTP",
+                    })
+                } else {
+                    res.status(201).json({
+                        message: "OTP sent successfully",
+                        otp: generatedOTP
+                    });
+                }
+            });
+        } else {
+            res.status(404).json({
+                error: "Email doesn't exist."
+            });
+        }
+    } catch (error) {
+        res.status(error.status || 500).json({
+            error: error.message
+        });
+    }
+};
+
+exports.changePassword = async (req, res) => {
+    res.status(201).json({
+        message: 'Password changed successfully'
+    });
 }

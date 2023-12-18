@@ -8,7 +8,10 @@ router.get('/', (req, res) => {
         message: 'Welcome Accredian-Backend-Task Web Server'
     });
 });
+
 router.post('/signup', userControllers.signup);
 router.post('/login', userControllers.login);
+router.post('/sendotp', userControllers.sendOTP);
+router.patch('/changepassword', userControllers.changePassword);
 
 module.exports = router;
