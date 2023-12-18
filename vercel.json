@@ -3,8 +3,8 @@
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "/app.js"
+        "dest": "/api/routes/Users.js"
       }
     ]
-  }
+}
   
