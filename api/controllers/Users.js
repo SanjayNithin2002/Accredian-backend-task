@@ -8,9 +8,6 @@ const connection = pool.promise();
 // regex function to check whether a string is email
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-// hashing password using bcrypt
-
-
 // signup handler fucntion
 const signupService = async (data) => {
     try {
