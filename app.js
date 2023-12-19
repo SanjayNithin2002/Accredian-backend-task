@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 // eslint-disable-next-line no-undef
 const port = process.env.PORT || 3000;
 const userRoutes = require('./api/routes/Users');
@@ -15,6 +16,7 @@ app.use(bodyParser.urlencoded({
     extended: true,
 }));
 // Handling CORS
+app.use(cors());
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header(
