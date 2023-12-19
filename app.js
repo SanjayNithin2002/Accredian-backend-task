@@ -16,7 +16,11 @@ app.use(bodyParser.urlencoded({
     extended: true,
 }));
 // Handling CORS
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',  // Replace with your frontend URL
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  }));
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header(
