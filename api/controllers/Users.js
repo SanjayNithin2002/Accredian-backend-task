@@ -120,6 +120,7 @@ exports.signup = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+    console.log(req.body);
     try {
         const result = await loginService(req.body);
         res.status(201).json({
@@ -172,7 +173,8 @@ exports.sendOTP = async (req, res) => {
                 } else {
                     res.status(201).json({
                         message: "OTP sent successfully",
-                        otp: generatedOTP
+                        otp: generatedOTP,
+                        email: req.body.email
                     });
                 }
             });
