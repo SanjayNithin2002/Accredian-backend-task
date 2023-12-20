@@ -32,6 +32,7 @@ app.use((req, res, next) => {
         );
         return res.status(200).json({});
     }
+    console.log(res);
     next();
 });
 
